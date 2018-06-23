@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<userOverrides>
+  <override>
+    <path>F:\YL_MAIN_CK\DL_Scale\YL_DLC\Src\CmdProcess.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>F:\YL_MAIN_CK\DL_Scale\YL_DLC\Src\ModbusRTUSlave.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>F:\YL_MAIN_CK\DL_Scale\YL_DLC\Src\Scale\Filter\Filter.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>F:\YL_MAIN_CK\DL_Scale\YL_DLC\Src\Scale\Filter\MyFilter.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>F:\YL_MAIN_CK\DL_Scale\YL_DLC\Src\Scale\Scale.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>F:\YL_MAIN_CK\DL_Scale\YL_DLC\Src\freertos.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>F:\YL_MAIN_CK\DL_Scale\YL_DLC\Src\i2c.c</path>
+    <encoding>System</encoding>
+  </override>
+  <override>
+    <path>F:\YL_MAIN_CK\DL_Scale\YL_DLC\Src\usart.c</path>
+    <encoding>System</encoding>
+  </override>
+</userOverrides>
+
+

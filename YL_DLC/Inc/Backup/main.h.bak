@@ -1,0 +1,76 @@
+/**
+  ******************************************************************************
+  * @file           : main.h
+  * @brief          : Header for main.c file.
+  *                   This file contains the common defines of the application.
+  ******************************************************************************
+  ******************************************************************************
+  */
+
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __MAIN_H__
+#define __MAIN_H__
+
+/* Includes ------------------------------------------------------------------*/
+
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* Private define ------------------------------------------------------------*/
+
+#define LC3_DOUT_Pin GPIO_PIN_0
+#define LC3_DOUT_GPIO_Port GPIOC
+#define LC3_SCLK_Pin GPIO_PIN_1
+#define LC3_SCLK_GPIO_Port GPIOC
+#define LC4_DOUT_Pin GPIO_PIN_2
+#define LC4_DOUT_GPIO_Port GPIOC
+#define LC4_SCLK_Pin GPIO_PIN_3
+#define LC4_SCLK_GPIO_Port GPIOC
+#define RS485_DE_Pin GPIO_PIN_8
+#define RS485_DE_GPIO_Port GPIOA
+#define LED1_Pin GPIO_PIN_10
+#define LED1_GPIO_Port GPIOC
+#define ADDR3_Pin GPIO_PIN_11
+#define ADDR3_GPIO_Port GPIOC
+#define ADDR2_Pin GPIO_PIN_12
+#define ADDR2_GPIO_Port GPIOC
+#define ADDR1_Pin GPIO_PIN_2
+#define ADDR1_GPIO_Port GPIOD
+#define ADDR0_Pin GPIO_PIN_3
+#define ADDR0_GPIO_Port GPIOB
+#define LC1_DOUT_Pin GPIO_PIN_4
+#define LC1_DOUT_GPIO_Port GPIOB
+#define LC1_SCLK_Pin GPIO_PIN_5
+#define LC1_SCLK_GPIO_Port GPIOB
+#define LC2_DOUT_Pin GPIO_PIN_8
+#define LC2_DOUT_GPIO_Port GPIOB
+#define LC2_SCLK_Pin GPIO_PIN_9
+#define LC2_SCLK_GPIO_Port GPIOB
+
+/* ########################## Assert Selection ############################## */
+/**
+  * @brief Uncomment the line below to expanse the "assert_param" macro in the 
+  *        HAL drivers code
+  */
+/* #define USE_FULL_ASSERT    1U */
+
+/* USER CODE BEGIN Private defines */
+
+void delay_us(unsigned int  Number);
+
+/* USER CODE END Private defines */
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+void _Error_Handler(char *, int);
+
+#define Error_Handler() _Error_Handler(__FILE__, __LINE__)
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __MAIN_H__ */
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

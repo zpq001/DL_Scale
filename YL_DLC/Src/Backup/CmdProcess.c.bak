@@ -1,0 +1,260 @@
+#include "CmdProcess.h"
+#include <string.h>
+#include <stdio.h>
+#include <math.h>
+
+#include "FreeRTOS.h"
+#include "cmsis_os.h"
+
+#include "scale.h"
+#include "UserParam.h"
+
+///
+//extern osMutexId myIICMutexHandle;
+extern int adcconts;
+extern void SendCom(int Nport,uint8_t *sendstr,int lenth,int timeout);
+
+void SendOK();
+void SendErr();
+static void SetCapacitiyAndIncr(char *cmdstr,unsigned char cmdlenth);
+
+static void ReadCapacityAndIncr(char *cmdstr,unsigned char cmdlenth);
+
+static void SetTestPoint(char *cmdstr,unsigned char cmdlenth);
+static void ReadTestPoint(char *cmdstr,unsigned char cmdlenth);
+
+static void SetGeoCode(char *cmdstr,unsigned char cmdlenth);
+static void ReadGeoCode(char *cmdstr,unsigned char cmdlenth);
+
+static void SetCalibration(char *cmdstr,unsigned char cmdlenth);
+static void ReadCalibration(char *cmdstr,unsigned char cmdlenth);
+// power up zero or cmd set zero
+static void SetZeroRang(char *cmdstr,unsigned char cmdlenth);
+static void ReadZeroRang(char *cmdstr,unsigned char cmdlenth);
+
+// SET ADC parameters,gain and speed
+static void SetADC(char *cmdstr,unsigned char cmdlenth);
+static void ReadADC(char *cmdstr,unsigned char cmdlenth);
+
+static void GetWeigt(char *cmdstr,unsigned char cmdlenth);
+
+static void GetADCvalue(char *cmdstr,unsigned char cmdlenth);
+
+
+
+uint8_t machine_addr;
+
+//CmdFramStruct cmdfram,respfram;
+
+char respsendbuf[20]={0};
+
+CmdStruct SetCmdArry[23] =
+{
+    
+    { "SETCI",		5,	SetCapacitiyAndIncr },
+	{ "READCI",		6,	ReadCapacityAndIncr },
+	{ "SETTP",		5,	SetTestPoint },
+	{ "READTP",		6,	ReadTestPoint },
+	{ "SETGEO",		6,	SetGeoCode },
+	{ "READGEO",	7,	ReadGeoCode },
+    { "SETCAL_D",   8,  SetCalibration},
+    { "READCAL_D",  9,  ReadCalibration},
+    { "SETZRANG",   8,  SetZeroRang},
+    { "READZRANG",  9,  ReadZeroRang},
+    {"SETADC",      6,  SetADC},
+    {"READADC",     7,  ReadADC},
+    {"GETW",        4,  GetWeigt},
+    {"GADCV",       5,  GetADCvalue}
+	
+};
+
+
+void SendOK(int Nport)
+{
+    SendCom(Nport,"OK\r\n",strlen("OK\r\n"),0);
+}
+
+void SendErr(int Nport)
+{
+    SendCom(Nport,"CMD error\r\n",strlen("CMD error\r\n"),0);
+}
+
+static void SetCapacitiyAndIncr(char *cmdstr,unsigned char cmdlenth)
+{
+    double tmpcap = 20.0;  //default
+    double tmpinr = 0.1;   //default
+    char  *ptrtmp = NULL;
+    int retvalue = 0;
+    ptrtmp = (cmdstr + cmdlenth);
+    
+    retvalue = sscanf(ptrtmp,"%lf %lf",&tmpcap,&tmpinr);
+    
+    if(retvalue == 2)
+    {
+       if(0== CheckIncrIsValid(tmpinr)&&((tmpcap>100*tmpinr)&&(tmpcap<tmpinr*300000)))
+       {
+           // save these paramters
+           SendOK(1);
+       }
+        else
+        {
+            
+        }
+    }
+    else
+        SendErr(1);
+    
+}
+
+static void ReadCapacityAndIncr(char *cmdstr,unsigned char cmdlenth)
+{
+    
+}
+
+static void SetTestPoint(char *cmdstr,unsigned char cmdlenth)
+{
+    
+}
+static void ReadTestPoint(char *cmdstr,unsigned char cmdlenth)
+{
+    
+}
+
+static void SetGeoCode(char *cmdstr,unsigned char cmdlenth)
+{
+    
+}
+
+static void ReadGeoCode(char *cmdstr,unsigned char cmdlenth)
+{
+    
+}
+// cmd SETCAL_D 0 0:  校准点1 0kg采集counts
+// CMD SETCAL_D 1 20
+static void SetCalibration(char *cmdstr,unsigned char cmdlenth)
+{
+    int testpoint;    // 校准点    
+    int calcounts = 0;     // 获取的counts值
+    double calweight; // 校准重量
+    int times = 0;
+    int precounts ;
+    if(2==sscanf((cmdstr+cmdlenth),"%d %lf",&testpoint,&calweight))
+    {
+        //
+        while(times <30)
+        {
+            if(fabs(adcconts-precounts) >20)
+            {
+                // 数据相差太大不算次数
+                precounts = adcconts;
+            }
+            else
+            {
+                precounts = adcconts;
+                times++;
+                calcounts+=adcconts;
+                SendCom(1,  "#", 1,0);
+                   
+            }
+//            osDelay(100); 
+        }
+        calcounts/=30;
+        
+//        osMutexWait (myIICMutexHandle, 0);
+//        taskENTER_CRITICAL();
+        CAL_AdjustCalParams(&g_ScaleData, testpoint, calweight, calcounts);
+//        osMutexRelease (myIICMutexHandle);
+        switch(testpoint)
+        {
+        case 0:
+//            osMutexWait (myIICMutexHandle, 0);
+            reInitializeScaleParameters(&g_ScaleData,CAL_INITZERO);
+//            osMutexRelease (myIICMutexHandle);
+//            USER_PARAM_Set(BLK0_zeroCalCounts, (uint8_t *)&(calcounts)); 
+            break;
+        case 1:
+
+//            osMutexWait (myIICMutexHandle, 0);
+            reInitializeScaleParameters(&g_ScaleData,CAL_INITSPAN);
+//            osMutexRelease (myIICMutexHandle);
+            break;
+        case 2:
+            break;
+        default:
+            break;
+        }
+//        SCALE_Init(&g_ScaleData); 
+//        taskEXIT_CRITICAL();
+    }
+    else
+        SendErr(1);
+    
+   
+       
+}
+
+static void ReadCalibration(char *cmdstr,unsigned char cmdlenth)
+{
+    
+}
+// power up zero or cmd set zero
+static void SetZeroRang(char *cmdstr,unsigned char cmdlenth)
+{
+    
+}
+
+static void ReadZeroRang(char *cmdstr,unsigned char cmdlenth)
+{
+    
+}
+
+// SET ADC parameters,gain and speed
+static void SetADC(char *cmdstr,unsigned char cmdlenth)
+{
+    
+}
+
+static void ReadADC(char *cmdstr,unsigned char cmdlenth)
+{
+    
+}
+
+
+static void GetWeigt(char *cmdstr,unsigned char cmdlenth)
+{
+     SendCom(1,  (uint8_t*)g_ScaleData.grossString, strlen(g_ScaleData.grossString),0);
+     SendCom(1,  "\r\n", 2,0);
+}
+
+
+static void GetADCvalue(char *cmdstr,unsigned char cmdlenth)
+{
+    
+    sprintf(respsendbuf,"adc = %d\r\n",adcconts);
+    SendCom(1,  (uint8_t*)respsendbuf, strlen(respsendbuf),0);
+    
+}
+
+
+
+
+void SetCmdProcess(char *recstr,CmdStruct *Ptrcmdstruct)
+{
+     
+     uint8_t i;
+     for (i = 0; i < 14; i++)
+     {
+          if (0 != strncmp(Ptrcmdstruct->cmdstr, recstr,Ptrcmdstruct->cmdstrlenth))
+          {
+              Ptrcmdstruct++;
+              continue;
+          }
+          else
+          {
+              Ptrcmdstruct->cmdproc(recstr,Ptrcmdstruct->cmdstrlenth);
+              break;
+
+          }
+      }
+    
+}
